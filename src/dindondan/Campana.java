@@ -6,6 +6,7 @@ package dindondan;
 
 import static java.lang.Thread.sleep;
 import java.util.Random;
+import java.util.concurrent.Semaphore;
 
 /**
  *
@@ -18,8 +19,8 @@ public class Campana extends Thread {
 
     private String suono;
     /* Suono che emette la determinata campana*/
-    private boolean delay;/* Booleana che dice se si deve aspettare*/
-    private boolean precedenza;/* Booleana che dice se bisogna effettuare lo yield*/
+    private Semaphore attuale;
+    private Semaphore successivo;
 
     private datiCondivisi ptrDatiC;
 
@@ -34,26 +35,11 @@ public class Campana extends Thread {
         this.suono = suono;
     }
 
-    /**
-     * @brief Costruttore della campana
-     *
-     * Cotruttore della campana, riceve il suono della campana se deve fare un
-     * delay o lo yield
-     *
-     * @param suono che emette la campana
-     * @param delay se deve aspettare
-     * @param precedenza se deve dare precedenza
-     */
-    public Campana(String suono, boolean delay, boolean precedenza) {
-        this.suono = suono;
-        this.delay = delay;
-        this.precedenza = precedenza;
-    }
 
-    public Campana(String suono, boolean delay, boolean precedenza, datiCondivisi datiC) {
+    public Campana(String suono, datiCondivisi datiC,Semaphore attuale,Semaphore successivo) {
         this.suono = suono;
-        this.delay = delay;
-        this.precedenza = precedenza;
+        this.attuale = attuale;
+        this.successivo = successivo;
         ptrDatiC = datiC;
     }
 
@@ -64,34 +50,28 @@ public class Campana extends Thread {
      * degli attributi delay e precedenza, per capire se eseguire lo yield o lo
      * sleep
      */
-    public void run() {
+    public void run() { 
         try {
             while (true) {
-                //Suono
-                System.out.println(suono);
-                if (delay) {
-                    Random rd = new Random();
-                    sleep(rd.nextInt(3000));
-                }
-                if (precedenza) {
-                    yield();
-                }
-
-                if (suono.equals("Din") || suono.equals("din")) {
-                    ptrDatiC.waitDin();
+                //Suono                         
+                if (suono.equals("Din") || suono.equals("din")) {  
+                    attuale.acquire();
                     ptrDatiC.incDin();
-                    ptrDatiC.signalDin();
+                    System.out.println(suono);
+                    successivo.release();
                 }
-                if (suono.equals("Don") || suono.equals("don")) {
-                    ptrDatiC.waitDon();
-                    ptrDatiC.incDon();
-                    ptrDatiC.signalDon();
+                if (suono.equals("Don") || suono.equals("don")) {   
+                    attuale.acquire();
+                    ptrDatiC.incDon();  
+                    System.out.println(suono);
+                    successivo.release();
                 }
                 if (suono.equals("Dan") || suono.equals("dan")) //if per delayù
-                {
-                    ptrDatiC.waitDan();
-                    ptrDatiC.incDan();
-                    ptrDatiC.signalDan();
+                {              
+                    attuale.acquire();
+                    ptrDatiC.incDan();    
+                    System.out.println(suono);
+                    successivo.release();
                 }
 
                 if (Thread.interrupted() == true) {
@@ -100,9 +80,7 @@ public class Campana extends Thread {
                 //Thread.sleep random time
                 //if per yeld
                 //Thread.yelds                
-                {
-
-                }
+        
             }
             //Se c'e sleep
         } catch (InterruptedException e) {
@@ -110,4 +88,5 @@ public class Campana extends Thread {
             System.out.println(e);
         }
     }
+    
 }

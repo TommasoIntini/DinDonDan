@@ -5,6 +5,7 @@
 package dindondan;
 
 import java.util.Scanner;
+import java.util.concurrent.Semaphore;
 
 /**
  *
@@ -21,18 +22,24 @@ public class DinDonDan {
     public static void main(String[] args) {
 
         Scanner sc = new Scanner(System.in);  //Creazione oggetto scanner
-
+        Semaphore sDin = new Semaphore(1);
+        Semaphore sDon = new Semaphore(0);
+        Semaphore sDan = new Semaphore(0);
+        
+        
         datiCondivisi datiC = new datiCondivisi();
         
         thVisualizza view = null;
-        Campana din = new Campana("Din", false, false, datiC);//Creo 3 oggetti campana
-        Campana don = new Campana("Don", false, false, datiC);
-        Campana dan = new Campana("Dan", false, false, datiC);//Ognuno emette un suono diverso
+        Campana din = new Campana("Din", datiC,sDin,sDon);//Creo 3 oggetti campana
+        Campana don = new Campana("Don", datiC,sDon,sDan);
+        Campana dan = new Campana("Dan", datiC,sDan,sDin);//Ognuno emette un suono diverso
         // TODO code application logic here
         sc.next();
         try {
             din.start();  //Avvia i thread
+            
             don.start();
+            
             dan.start();
 
             sc.next(); //attesa input

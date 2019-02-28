@@ -29,10 +29,8 @@ public class datiCondivisi {
     /**
      * incrementa il numero di Dan
      */
-    
-    private Semaforo semDin = null;
-    private Semaforo semDon = null;
-    private Semaforo semDan = null;
+   
+
     /**
      * @brief costruttore dell'oggetto datiCondivisi
      *
@@ -42,10 +40,6 @@ public class datiCondivisi {
         nDin = 0;
         nDan = 0;
         nDon = 0;
-        
-        semDin = new Semaforo(1);
-        semDon = new Semaforo(1);
-        semDan = new Semaforo(1);
     }
 
     /**
@@ -65,7 +59,7 @@ public class datiCondivisi {
     /**
      * @brief restituisce il valore dell'attributo nDan
      */
-    public int getnDan() {
+    public  int getnDan() {
         return nDan;
     }
 
@@ -86,7 +80,7 @@ public class datiCondivisi {
     /**
      * @brief incrementa il valore dell'attributo nDon
      */
-    public void incDon() {
+    public synchronized void incDon() {
         nDon++;
     }
 
@@ -111,31 +105,5 @@ public class datiCondivisi {
         }
 
         return Max;
-    }
-    
-    public void waitDin()
-    {
-        semDin.Wait();
-    }
-    public void waitDon()
-    {
-        semDon.Wait();
-    }
-    public void waitDan()
-    {
-        semDan.Wait();
-    }
-    
-    public void signalDin()
-    {
-        semDin.Signal();
-    }
-    public void signalDon()
-    {
-        semDon.Signal();
-    }
-    public void signalDan()
-    {
-        semDan.Signal();
-    }
+    } 
 }
